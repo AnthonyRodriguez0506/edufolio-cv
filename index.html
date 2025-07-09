@@ -9,15 +9,16 @@
     <link rel="stylesheet" href="style/gallery.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="shortcut icon" href="/icons/cv.png" type="image/x-icon">
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <h1>Edufolio</h1>
+            <h1>Bienvenido a Edufolio</h1>
             <p>Generador de CV Profesional</p>
             <div class="header-buttons">
-                <button id="clearBtn" class="btn btn-danger">🗑️ Limpiar Todo</button>
-                <button id="exportBtn" class="btn btn-primary">📄 Exportar PDF</button>
+                <button id="clearBtn" class="btn btn-danger">Limpiar Todo</button>
+                <button id="exportBtn" class="btn btn-primary">Exportar PDF</button>
             </div>
         </header>
 
@@ -31,29 +32,25 @@
                         </div>
                         <div class="photo-controls">
                             <input type="file" id="profilePhotoInput" accept="image/*" style="display: none;">
-                            <button id="uploadPhotoBtn" class="btn btn-small">📷 Subir</button>
+                            <button id="uploadPhotoBtn" class="btn btn-small">Subir</button>
                             <button id="deletePhotoBtn" class="btn btn-small btn-danger" style="display: none;">🗑️</button>
                         </div>
                     </div>
                     <div class="basic-info">
-                        <h2 contenteditable="true" id="fullName" class="editable" placeholder="Tu Nombre Completo">Juan Pérez García</h2>
-                        <p contenteditable="true" id="profession" class="editable profession" placeholder="Tu Profesión">Desarrollador Full Stack</p>
+                        <h2 contenteditable="true" id="fullName" class="editable" placeholder="Tu Nombre Completo">Tu nombre completo</h2>
+                        <p contenteditable="true" id="profession" class="editable profession" placeholder="Tu Profesión">Tu profesión</p>
                         <div class="contact-info">
                             <div class="contact-item">
                                 <span class="icon">📧</span>
-                                <span contenteditable="true" id="email" class="editable" placeholder="correo@ejemplo.com">juan.perez@email.com</span>
+                                <span contenteditable="true" id="email" class="editable" placeholder="correo@ejemplo.com">Coloca aquí tu mail</span>
                             </div>
                             <div class="contact-item">
                                 <span class="icon">📱</span>
-                                <span contenteditable="true" id="phone" class="editable" placeholder="+1234567890">+52 555 123 4567</span>
+                                <span contenteditable="true" id="phone" class="editable" placeholder="+1234567890">+1 (000) 000-0000</span>
                             </div>
                             <div class="contact-item">
                                 <span class="icon">📍</span>
-                                <span contenteditable="true" id="location" class="editable" placeholder="Ciudad, País">Ciudad de México, México</span>
-                            </div>
-                            <div class="contact-item">
-                                <span class="icon">🌐</span>
-                                <span contenteditable="true" id="website" class="editable" placeholder="www.tusitio.com">www.juanperez.dev</span>
+                                <span contenteditable="true" id="location" class="editable" placeholder="Ciudad, País">Coloca aquí tu dirección</span>
                             </div>
                         </div>
                     </div>
@@ -63,7 +60,7 @@
             <section class="section">
                 <h3 class="section-title">📝 Resumen Profesional</h3>
                 <div contenteditable="true" id="summary" class="editable summary-text" placeholder="Escribe un breve resumen de tu perfil profesional...">
-                    Desarrollador Full Stack con más de 5 años de experiencia en el desarrollo de aplicaciones web modernas. Especializado en JavaScript, React, Node.js y bases de datos. Apasionado por crear soluciones innovadoras y eficientes.
+                    Descríbete como profesional
                 </div>
             </section>
 
@@ -72,14 +69,12 @@
                 <div id="experienceContainer" class="experience-container">
                     <div class="experience-item">
                         <div class="experience-header">
-                            <h4 contenteditable="true" class="editable job-title" placeholder="Título del Puesto">Desarrollador Senior Full Stack</h4>
-                            <span contenteditable="true" class="editable job-period" placeholder="2020 - Presente">2020 - Presente</span>
+                            <h4 contenteditable="true" class="editable job-title" placeholder="Título del Puesto">Título del puesto</h4>
+                            <span contenteditable="true" class="editable job-period" placeholder="2020 - Presente">año de entrada / año de salida</span>
                         </div>
-                        <h5 contenteditable="true" class="editable company-name" placeholder="Nombre de la Empresa">TechCorp Solutions</h5>
+                        <h5 contenteditable="true" class="editable company-name" placeholder="Nombre de la Empresa">Nombre de la Empresa</h5>
                         <ul contenteditable="true" class="editable job-description" placeholder="• Describe tus responsabilidades y logros...">
-                            <li>Desarrollo de aplicaciones web usando React y Node.js</li>
-                            <li>Liderazgo de equipo de 4 desarrolladores junior</li>
-                            <li>Implementación de arquitecturas escalables en AWS</li>
+                            <li>Nueva Responsabilidad</li>
                         </ul>
                     </div>
                 </div>
@@ -91,10 +86,10 @@
                 <div id="educationContainer" class="education-container">
                     <div class="education-item">
                         <div class="education-header">
-                            <h4 contenteditable="true" class="editable degree-title" placeholder="Título/Grado">Ingeniería en Sistemas Computacionales</h4>
-                            <span contenteditable="true" class="editable education-period" placeholder="2015 - 2019">2015 - 2019</span>
+                            <h4 contenteditable="true" class="editable degree-title" placeholder="Título/Grado">Título/Grado</h4>
+                            <span contenteditable="true" class="editable education-period" placeholder="2015 - 2019">año de entrada / año de salida</span>
                         </div>
-                        <h5 contenteditable="true" class="editable institution-name" placeholder="Institución">Universidad Tecnológica Nacional</h5>
+                        <h5 contenteditable="true" class="editable institution-name" placeholder="Institución">Institución</h5>
                     </div>
                 </div>
                 <button id="addEducationBtn" class="btn btn-secondary">➕ Agregar Educación</button>
@@ -103,7 +98,7 @@
             <section class="section">
                 <h3 class="section-title">🛠️ Habilidades</h3>
                 <div contenteditable="true" id="skills" class="editable skills-text" placeholder="Lista tus habilidades principales...">
-                    JavaScript, React, Node.js, Python, SQL, MongoDB, AWS, Docker, Git, Agile/Scrum
+                    Describe aquí tus habilidades en tu profesión
                 </div>
             </section>
 
