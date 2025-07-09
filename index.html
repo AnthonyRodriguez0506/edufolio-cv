@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edufolio - Generador de CV</title>
+    <link rel="stylesheet" href="style/main.css">
+    <link rel="stylesheet" href="style/modal.css">
+    <link rel="stylesheet" href="style/gallery.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Edufolio</h1>
+            <p>Generador de CV Profesional</p>
+            <div class="header-buttons">
+                <button id="clearBtn" class="btn btn-danger">🗑️ Limpiar Todo</button>
+                <button id="exportBtn" class="btn btn-primary">📄 Exportar PDF</button>
+            </div>
+        </header>
+
+        <main class="cv-container" id="cvContainer">
+
+            <section class="personal-info">
+                <div class="profile-section">
+                    <div class="profile-photo-container">
+                        <div id="profilePhotoDisplay" class="profile-photo">
+                            <span class="photo-placeholder">📷 Foto</span>
+                        </div>
+                        <div class="photo-controls">
+                            <input type="file" id="profilePhotoInput" accept="image/*" style="display: none;">
+                            <button id="uploadPhotoBtn" class="btn btn-small">📷 Subir</button>
+                            <button id="deletePhotoBtn" class="btn btn-small btn-danger" style="display: none;">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="basic-info">
+                        <h2 contenteditable="true" id="fullName" class="editable" placeholder="Tu Nombre Completo">Juan Pérez García</h2>
+                        <p contenteditable="true" id="profession" class="editable profession" placeholder="Tu Profesión">Desarrollador Full Stack</p>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <span class="icon">📧</span>
+                                <span contenteditable="true" id="email" class="editable" placeholder="correo@ejemplo.com">juan.perez@email.com</span>
+                            </div>
+                            <div class="contact-item">
+                                <span class="icon">📱</span>
+                                <span contenteditable="true" id="phone" class="editable" placeholder="+1234567890">+52 555 123 4567</span>
+                            </div>
+                            <div class="contact-item">
+                                <span class="icon">📍</span>
+                                <span contenteditable="true" id="location" class="editable" placeholder="Ciudad, País">Ciudad de México, México</span>
+                            </div>
+                            <div class="contact-item">
+                                <span class="icon">🌐</span>
+                                <span contenteditable="true" id="website" class="editable" placeholder="www.tusitio.com">www.juanperez.dev</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h3 class="section-title">📝 Resumen Profesional</h3>
+                <div contenteditable="true" id="summary" class="editable summary-text" placeholder="Escribe un breve resumen de tu perfil profesional...">
+                    Desarrollador Full Stack con más de 5 años de experiencia en el desarrollo de aplicaciones web modernas. Especializado en JavaScript, React, Node.js y bases de datos. Apasionado por crear soluciones innovadoras y eficientes.
+                </div>
+            </section>
+
+            <section class="section">
+                <h3 class="section-title">💼 Experiencia Laboral</h3>
+                <div id="experienceContainer" class="experience-container">
+                    <div class="experience-item">
+                        <div class="experience-header">
+                            <h4 contenteditable="true" class="editable job-title" placeholder="Título del Puesto">Desarrollador Senior Full Stack</h4>
+                            <span contenteditable="true" class="editable job-period" placeholder="2020 - Presente">2020 - Presente</span>
+                        </div>
+                        <h5 contenteditable="true" class="editable company-name" placeholder="Nombre de la Empresa">TechCorp Solutions</h5>
+                        <ul contenteditable="true" class="editable job-description" placeholder="• Describe tus responsabilidades y logros...">
+                            <li>Desarrollo de aplicaciones web usando React y Node.js</li>
+                            <li>Liderazgo de equipo de 4 desarrolladores junior</li>
+                            <li>Implementación de arquitecturas escalables en AWS</li>
+                        </ul>
+                    </div>
+                </div>
+                <button id="addExperienceBtn" class="btn btn-secondary">➕ Agregar Experiencia</button>
+            </section>
+
+            <section class="section">
+                <h3 class="section-title">🎓 Educación</h3>
+                <div id="educationContainer" class="education-container">
+                    <div class="education-item">
+                        <div class="education-header">
+                            <h4 contenteditable="true" class="editable degree-title" placeholder="Título/Grado">Ingeniería en Sistemas Computacionales</h4>
+                            <span contenteditable="true" class="editable education-period" placeholder="2015 - 2019">2015 - 2019</span>
+                        </div>
+                        <h5 contenteditable="true" class="editable institution-name" placeholder="Institución">Universidad Tecnológica Nacional</h5>
+                    </div>
+                </div>
+                <button id="addEducationBtn" class="btn btn-secondary">➕ Agregar Educación</button>
+            </section>
+
+            <section class="section">
+                <h3 class="section-title">🛠️ Habilidades</h3>
+                <div contenteditable="true" id="skills" class="editable skills-text" placeholder="Lista tus habilidades principales...">
+                    JavaScript, React, Node.js, Python, SQL, MongoDB, AWS, Docker, Git, Agile/Scrum
+                </div>
+            </section>
+
+            <section class="section">
+                <h3 class="section-title">🏆 Certificados</h3>
+                <div class="certificates-section">
+                    <div class="certificates-gallery">
+                        <div class="gallery-container">
+                            <button id="prevCertBtn" class="gallery-nav prev" style="display: none;">⏪</button>
+                            <div id="certificatesDisplay" class="certificates-display">
+                                <div class="certificate-placeholder">
+                                    <span>📜 Sube tus certificados</span>
+                                </div>
+                            </div>
+                            <button id="nextCertBtn" class="gallery-nav next" style="display: none;">⏩</button>
+                        </div>
+                        <div class="certificates-controls">
+                            <input type="file" id="certificateInput" accept="image/*" multiple style="display: none;">
+                            <button id="uploadCertBtn" class="btn btn-secondary">📜 Subir Certificados</button>
+                            <span id="certCounter" class="cert-counter"></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img id="modalImage" src="/placeholder.svg" alt="Imagen ampliada">
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/modal.js"></script>
+    <script src="js/gallery.js"></script>
+    <script src="js/pdf-export.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
