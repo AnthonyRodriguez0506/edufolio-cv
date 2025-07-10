@@ -1,6 +1,4 @@
 // Gestión de exportación a PDF
-import html2canvas from "html2canvas" // Import html2canvas
-
 class PDFExporter {
   constructor() {
     this.exportBtn = document.getElementById("exportBtn")
@@ -8,23 +6,43 @@ class PDFExporter {
   }
 
   initializeEvents() {
-    this.exportBtn.addEventListener("click", () => {
-      this.exportToPDF()
-    })
+    if (this.exportBtn) {
+      this.exportBtn.addEventListener("click", () => {
+        this.exportToPDF()
+      })
+    }
   }
 
   async exportToPDF() {
+    // Verificar que las librerías estén disponibles
+    if (!window.html2canvas) {
+      alert("Error: html2canvas no está disponible. Verifica que la librería esté cargada.")
+      return
+    }
+
+    if (!window.jspdf) {
+      alert("Error: jsPDF no está disponible. Verifica que la librería esté cargada.")
+      return
+    }
+
     try {
       this.showLoadingState()
 
       const cvContainer = document.getElementById("cvContainer")
+      if (!cvContainer) {
+        throw new Error("No se encontró el contenedor del CV")
+      }
+
       const originalStyle = cvContainer.style.cssText
 
       // Preparar el contenedor para la captura
       this.prepareForCapture(cvContainer)
 
+      // Esperar un momento para que se apliquen los estilos
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
       // Configuración de html2canvas
-      const canvas = await html2canvas(cvContainer, {
+      const canvas = await window.html2canvas(cvContainer, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
@@ -33,10 +51,22 @@ class PDFExporter {
         height: cvContainer.scrollHeight,
         scrollX: 0,
         scrollY: 0,
+        logging: false,
+        onclone: (clonedDoc) => {
+          // Asegurar que las imágenes se muestren en el clon
+          const clonedContainer = clonedDoc.getElementById("cvContainer")
+          if (clonedContainer) {
+            const controlButtons = clonedContainer.querySelectorAll(".delete-cert, .gallery-nav")
+            controlButtons.forEach((btn) => {
+              btn.style.display = "none"
+            })
+          }
+        },
       })
 
       // Restaurar estilos originales
       cvContainer.style.cssText = originalStyle
+      this.restoreAfterCapture(cvContainer)
 
       // Crear PDF
       const { jsPDF } = window.jspdf
@@ -67,7 +97,7 @@ class PDFExporter {
       this.showSuccessMessage()
     } catch (error) {
       console.error("Error al exportar PDF:", error)
-      this.showErrorMessage()
+      this.showErrorMessage(error.message)
     } finally {
       this.hideLoadingState()
     }
@@ -78,6 +108,7 @@ class PDFExporter {
     container.style.width = "auto"
     container.style.height = "auto"
     container.style.overflow = "visible"
+    container.style.transform = "none"
 
     // Ocultar botones de control temporalmente
     const controlButtons = container.querySelectorAll(".delete-cert, .gallery-nav")
@@ -91,6 +122,36 @@ class PDFExporter {
       if (img.src.startsWith("data:")) {
         img.crossOrigin = "anonymous"
       }
+      // Asegurar que la imagen tenga dimensiones
+      if (!img.style.width && !img.style.height) {
+        img.style.maxWidth = "100%"
+        img.style.height = "auto"
+      }
+    })
+
+    // Forzar el renderizado de elementos contenteditable
+    const editableElements = container.querySelectorAll("[contenteditable]")
+    editableElements.forEach((element) => {
+      element.setAttribute("contenteditable", "false")
+    })
+  }
+
+  restoreAfterCapture(container) {
+    // Restaurar botones de control
+    const controlButtons = container.querySelectorAll(".delete-cert")
+    controlButtons.forEach((btn) => {
+      btn.style.display = ""
+    })
+
+    const navButtons = container.querySelectorAll(".gallery-nav")
+    navButtons.forEach((btn) => {
+      btn.style.display = ""
+    })
+
+    // Restaurar contenteditable
+    const editableElements = container.querySelectorAll(".editable")
+    editableElements.forEach((element) => {
+      element.setAttribute("contenteditable", "true")
     })
   }
 
@@ -110,85 +171,88 @@ class PDFExporter {
   }
 
   generateFileName() {
-    const name = document.getElementById("fullName").textContent.trim() || "CV"
+    const nameElement = document.getElementById("fullName")
+    const name = nameElement ? nameElement.textContent.trim() : "CV"
     const date = new Date().toISOString().split("T")[0]
-    return `${name.replace(/\s+/g, "_")}_CV_${date}.pdf`
+    const cleanName = name.replace(/[^a-zA-Z0-9\s]/g, "").replace(/\s+/g, "_")
+    return `${cleanName || "CV"}_${date}.pdf`
   }
 
   showLoadingState() {
-    this.exportBtn.disabled = true
-    this.exportBtn.innerHTML = "⏳ Generando PDF..."
+    if (this.exportBtn) {
+      this.exportBtn.disabled = true
+      this.exportBtn.innerHTML = "⏳ Generando PDF..."
+    }
   }
 
   hideLoadingState() {
-    this.exportBtn.disabled = false
-    this.exportBtn.innerHTML = "📄 Exportar PDF"
+    if (this.exportBtn) {
+      this.exportBtn.disabled = false
+      this.exportBtn.innerHTML = "📄 Exportar PDF"
+    }
   }
 
   showSuccessMessage() {
-    const message = document.createElement("div")
-    message.className = "success-message"
-    message.innerHTML = "✅ PDF generado exitosamente"
-    message.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--success-color);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: var(--shadow-lg);
-            z-index: 1000;
-            animation: slideIn 0.3s ease;
-        `
-
-    document.body.appendChild(message)
-
-    setTimeout(() => {
-      message.remove()
-    }, 3000)
+    this.showMessage("✅ PDF generado exitosamente", "var(--success-color)", 3000)
   }
 
-  showErrorMessage() {
+  showErrorMessage(errorMsg = "Error desconocido") {
+    this.showMessage(`❌ Error al generar PDF: ${errorMsg}`, "var(--danger-color)", 5000)
+  }
+
+  showMessage(text, backgroundColor, duration) {
+    // Remover mensaje anterior si existe
+    const existingMessage = document.querySelector(".pdf-message")
+    if (existingMessage) {
+      existingMessage.remove()
+    }
+
     const message = document.createElement("div")
-    message.className = "error-message"
-    message.innerHTML = "❌ Error al generar PDF"
+    message.className = "pdf-message"
+    message.innerHTML = text
     message.style.cssText = `
             position: fixed;
             top: 20px;
             right: 20px;
-            background: var(--danger-color);
+            background: ${backgroundColor};
             color: white;
             padding: 15px 20px;
             border-radius: 8px;
-            box-shadow: var(--shadow-lg);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
             z-index: 1000;
-            animation: slideIn 0.3s ease;
+            animation: slideInRight 0.3s ease;
+            max-width: 300px;
+            word-wrap: break-word;
         `
 
     document.body.appendChild(message)
 
     setTimeout(() => {
-      message.remove()
-    }, 5000)
+      if (message.parentNode) {
+        message.remove()
+      }
+    }, duration)
   }
 }
 
 // Agregar animación CSS para los mensajes
-const style = document.createElement("style")
-style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
+if (!document.querySelector("#pdf-animations")) {
+  const style = document.createElement("style")
+  style.id = "pdf-animations"
+  style.textContent = `
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-`
-document.head.appendChild(style)
+    `
+  document.head.appendChild(style)
+}
 
 // Instancia global
 window.pdfExporter = new PDFExporter()
