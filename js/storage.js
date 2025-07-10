@@ -11,9 +11,11 @@ class StorageManager {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(data))
       console.log("Datos guardados correctamente")
+      return true
     } catch (error) {
       console.error("Error al guardar datos:", error)
       alert("Error al guardar los datos. El almacenamiento local puede estar lleno.")
+      return false
     }
   }
 
@@ -33,8 +35,10 @@ class StorageManager {
     try {
       localStorage.removeItem(this.storageKey)
       console.log("Datos eliminados correctamente")
+      return true
     } catch (error) {
       console.error("Error al eliminar datos:", error)
+      return false
     }
   }
 
@@ -53,14 +57,14 @@ class StorageManager {
   getCurrentData() {
     const data = {
       // Información personal
-      fullName: document.getElementById("fullName").textContent.trim(),
-      profession: document.getElementById("profession").textContent.trim(),
-      email: document.getElementById("email").textContent.trim(),
-      phone: document.getElementById("phone").textContent.trim(),
-      location: document.getElementById("location").textContent.trim(),
-      website: document.getElementById("website").textContent.trim(),
-      summary: document.getElementById("summary").textContent.trim(),
-      skills: document.getElementById("skills").textContent.trim(),
+      fullName: this.getTextContent("fullName"),
+      profession: this.getTextContent("profession"),
+      email: this.getTextContent("email"),
+      phone: this.getTextContent("phone"),
+      location: this.getTextContent("location"),
+      website: this.getTextContent("website"),
+      summary: this.getTextContent("summary"),
+      skills: this.getTextContent("skills"),
 
       // Foto de perfil
       profilePhoto: this.getProfilePhotoData(),
@@ -81,10 +85,16 @@ class StorageManager {
     return data
   }
 
+  // Helper para obtener contenido de texto
+  getTextContent(id) {
+    const element = document.getElementById(id)
+    return element ? element.textContent.trim() : ""
+  }
+
   // Obtener datos de la foto de perfil
   getProfilePhotoData() {
     const photoDisplay = document.getElementById("profilePhotoDisplay")
-    const img = photoDisplay.querySelector("img")
+    const img = photoDisplay ? photoDisplay.querySelector("img") : null
     return img ? img.src : null
   }
 
@@ -185,9 +195,11 @@ class StorageManager {
   // Cargar foto de perfil
   loadProfilePhoto(photoData) {
     const photoDisplay = document.getElementById("profilePhotoDisplay")
-    const placeholder = photoDisplay.querySelector(".photo-placeholder")
     const deleteBtn = document.getElementById("deletePhotoBtn")
 
+    if (!photoDisplay || !deleteBtn) return
+
+    const placeholder = photoDisplay.querySelector(".photo-placeholder")
     if (placeholder) {
       placeholder.remove()
     }
@@ -195,7 +207,11 @@ class StorageManager {
     const img = document.createElement("img")
     img.src = photoData
     img.alt = "Foto de perfil"
-    img.onclick = () => window.modalManager.openModal(photoData)
+    img.onclick = () => {
+      if (window.modalManager) {
+        window.modalManager.openModal(photoData)
+      }
+    }
 
     photoDisplay.innerHTML = ""
     photoDisplay.appendChild(img)
@@ -205,6 +221,8 @@ class StorageManager {
   // Cargar datos de experiencia
   loadExperienceData(experiences) {
     const container = document.getElementById("experienceContainer")
+    if (!container) return
+
     container.innerHTML = ""
 
     experiences.forEach((exp) => {
@@ -216,6 +234,8 @@ class StorageManager {
   // Cargar datos de educación
   loadEducationData(educations) {
     const container = document.getElementById("educationContainer")
+    if (!container) return
+
     container.innerHTML = ""
 
     educations.forEach((edu) => {

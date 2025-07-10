@@ -269,13 +269,28 @@ class EdufolioApp {
   }
 
   saveData() {
-    const data = window.storageManager.getCurrentData()
-    window.storageManager.saveData(data)
+    try {
+      const data = window.storageManager.getCurrentData()
+      const success = window.storageManager.saveData(data)
+      if (success) {
+        console.log("💾 Datos guardados automáticamente")
+      }
+    } catch (error) {
+      console.error("Error al guardar datos:", error)
+    }
   }
 
   scheduleAutoSave() {
-    window.storageManager.scheduleAutoSave(() => {
+    // Auto-guardado cada 30 segundos
+    setInterval(() => {
       this.saveData()
+    }, 30000)
+
+    // Auto-guardado al cambiar de pestaña o cerrar
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        this.saveData()
+      }
     })
   }
 
